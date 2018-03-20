@@ -13,7 +13,7 @@ import java.util.HashMap;
  */
 public class OpTable {
     
-    public static final HashMap<String, String> opTable = new HashMap<>();
+    public final HashMap<String, String> opTable = new HashMap<>();
     
     
     public OpTable(){
@@ -78,13 +78,13 @@ public class OpTable {
         opTable.put("SUBF", "5C");
 }
     
-     public static boolean contains(String key){
+     public boolean contains(String key){
         return opTable.containsKey(key);
     }
     
     
     
-    public static String getOpCode(String key){
+    public String getOpCode(String key){
         if(opTable.containsKey(key)){
             return opTable.get(key);
         }

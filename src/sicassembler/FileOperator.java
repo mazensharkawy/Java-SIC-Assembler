@@ -26,8 +26,9 @@ public class FileOperator {
     public HashMap<String, Integer> symTable = new HashMap<>();
     public String programName;
     public StringBuilder writer;
+    private OpTable opTable = new OpTable();
 
-    public void executeAssemblerPathOne(String filePath) {
+    public void executeAssemblerPassOne(String filePath) {
 
         FileReader fileReader = null;
         String[] tokens;
@@ -47,13 +48,15 @@ public class FileOperator {
                     continue;
                 }
                 if (isValidAssemblyLine(newLine)) {
-                    instructions.add(parseLine(newLine));
+                    Instruction newInstruction = parseLine(newLine);
+                    instructions.add(newInstruction);
+                    System.out.println(newInstruction);
 
-                    System.out.println(newLine);
+                    //System.out.println(locationCounter+"    "+newLine);
                 }
             }
-            programLength = locationCounter-startingAddress;
-            
+            programLength = locationCounter - startingAddress;
+
             reader.close();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(FileOperator.class.getName()).log(Level.SEVERE, null, ex);
@@ -67,25 +70,25 @@ public class FileOperator {
         }
 
     }
-    
-    public void executeAssemblerPassTwo(){
+
+    public void executeAssemblerPassTwo() {
 //        OpTable opCodes = new OpTable();
-        writer=new StringBuilder();
+        writer = new StringBuilder();
         writer.append("H").append(programName).append(" ")
                 .append(Integer.toHexString(startingAddress)).append(Integer.toHexString(programLength));
-        int t =10;
-        for(Instruction instruction : instructions ){
-            if(t==10){
-                t=0;
+        int t = 10;
+        for (Instruction instruction : instructions) {
+            if (t == 10) {
+                t = 0;
                 writer.append("%n");
                 writer.append("T").append(Integer.toHexString(instruction.getLocation()));
-                if(instructions.get(instructions.size()-1).getLocation() > instruction.getLocation() +30){
+                if (instructions.get(instructions.size() - 1).getLocation() > instruction.getLocation() + 30) {
                     writer.append("1E");
-                } else{
-                    writer.append(Integer.toHexString(instructions.get(instructions.size()-1).getLocation()-instruction.getLocation()));
+                } else {
+                    writer.append(Integer.toHexString(instructions.get(instructions.size() - 1).getLocation() - instruction.getLocation()));
                 }
             }
-            
+
             writer.append(instruction.getOperand());
         }
         writer.append("%n");
@@ -127,30 +130,30 @@ public class FileOperator {
         String operand = null;
         if (tokens.length == 1) {
 
-            if (!OpTable.contains(tokens[0])) {
+            if (opTable.contains(tokens[0])) {
                 opCode = tokens[0];
             } else {
-                System.out.println("Error, OpCode is incorrect");
+                throw new RuntimeException("ERROR, Unrecognised Mnemonic");
             }
 
         } else if (tokens.length == 2) {
 
-            if (!OpTable.contains(tokens[0])) {
+            if (opTable.contains(tokens[0])) {
                 opCode = tokens[0];
                 operand = tokens[1];
             } else {
-                System.out.println("Error, OpCode is incorrect");
+                throw new RuntimeException("ERROR, Unrecognised Mnemonic");
             }
         } else if (tokens.length == 3) {
-            if (!OpTable.contains(tokens[0])) {
+            if (opTable.contains(tokens[1]) || isValidDirective(tokens[1])) {
                 symbol = tokens[0];
                 opCode = tokens[1];
                 operand = tokens[2];
             } else {
-                System.out.println("Error, OpCode is incorrect");
+                throw new RuntimeException("ERROR, Unrecognised Mnemonic");
             }
             if (symTable.containsKey(tokens[0])) {
-                System.out.println("ERROR, Duplicate Symbol");
+                throw new RuntimeException("ERROR, Duplicate Symbol");
             }
             symTable.put(symbol, locationCounter);
         }
@@ -163,6 +166,11 @@ public class FileOperator {
         incrementLocationCounter(opCode, operand);
 
         return instruction;
+    }
+
+    private boolean isValidDirective(String opCode) {
+        String newOpCode = opCode.trim().toUpperCase();
+        return ("BYTE".equals(newOpCode) || "WORD".equals(newOpCode) || "RESW".equals(newOpCode) || "RESB".equals(newOpCode));
     }
 
     private boolean isIndexed(String operand) {
