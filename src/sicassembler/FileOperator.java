@@ -21,7 +21,7 @@ public class FileOperator {
     public int locationCounter;
     public int startingAddress;
     public ArrayList<Instruction> instructions = new ArrayList<>();
-    public HashMap<String, String> symTable = new HashMap<>();
+    public HashMap<String, Integer> symTable = new HashMap<>();
 
     public void executeAssemblerPathOne(String filePath) {
 
@@ -38,7 +38,7 @@ public class FileOperator {
                 parseFirstLine(newLine);
             } while (newLine.startsWith("#"));
 
-            while ((newLine = reader.readLine())!=null&&!startWith(newLine, "END")) {
+            while ((newLine = reader.readLine()) != null && !startWith(newLine, "END")) {
                 if (newLine.startsWith("#")) {
                     continue;
                 }
@@ -92,25 +92,57 @@ public class FileOperator {
 
         String[] tokens = line.trim().split("\\s+");
         Instruction instruction = new Instruction();
+        String symbol = null;
+        String opCode = null;
+        int location = -1;
+        String operand = null;
         if (tokens.length == 1) {
-            instruction.setMnemonic(tokens[0]);
+
+            if (!OpTable.contains(tokens[0])) {
+                opCode = tokens[0];
+            } else {
+                System.out.println("Error, OpCode is incorrect");
+            }
+
         } else if (tokens.length == 2) {
-            instruction.setMnemonic(tokens[0]);
-            instruction.setOperand(tokens[1]);
+
+            if (!OpTable.contains(tokens[0])) {
+                opCode = tokens[0];
+                operand = tokens[1];
+            } else {
+                System.out.println("Error, OpCode is incorrect");
+            }
         } else if (tokens.length == 3) {
-            instruction.setSymbol(tokens[0]);
-            instruction.setMnemonic(tokens[1]);
-            instruction.setOperand(tokens[2]);
+            if (!OpTable.contains(tokens[0])) {
+                symbol = tokens[0];
+                opCode = tokens[1];
+                operand = tokens[2];
+            } else {
+                System.out.println("Error, OpCode is incorrect");
+            }
+            if (symTable.containsKey(tokens[0])) {
+                System.out.println("ERROR, Duplicate Symbol");
+            }
+            symTable.put(tokens[0], locationCounter);
         }
+        instruction.setSymbol(opCode);
+        instruction.setMnemonic(opCode);
+        instruction.setOperand(operand);
         instruction.setLocation(locationCounter);
+        instruction.isIndexed = isIndexed(operand);
         locationCounter += 3;
         return instruction;
     }
 
+    private boolean isIndexed(String operand) {
+        if (operand != null && operand.replaceAll("\\s+", "").toUpperCase().contains(",X")) {
+            return true;
+        }
+        return false;
+    }
+
     private boolean parseFirstLine(String line) {
-
-        String[] tokens = line.split(" ");
-
+        String[] tokens = line.trim().split("\\s+");
         if (tokens.length == 3 && "START".equals(tokens[1].toUpperCase())) {
             startingAddress = Integer.parseInt(tokens[2]);
             locationCounter = Integer.parseInt(tokens[2]);
