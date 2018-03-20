@@ -22,7 +22,10 @@ public class FileOperator {
     public int startingAddress;
     public int programLength;
     public ArrayList<Instruction> instructions = new ArrayList<>();
+
     public HashMap<String, Integer> symTable = new HashMap<>();
+    public String programName;
+    public StringBuilder writer;
 
     public void executeAssemblerPathOne(String filePath) {
 
@@ -63,6 +66,30 @@ public class FileOperator {
             }
         }
 
+    }
+    
+    public void executeAssemblerPassTwo(){
+//        OpTable opCodes = new OpTable();
+        writer=new StringBuilder();
+        writer.append("H").append(programName).append(" ")
+                .append(Integer.toHexString(startingAddress)).append(Integer.toHexString(programLength));
+        int t =10;
+        for(Instruction instruction : instructions ){
+            if(t==10){
+                t=0;
+                writer.append("%n");
+                writer.append("T").append(Integer.toHexString(instruction.getLocation()));
+                if(instructions.get(instructions.size()-1).getLocation() > instruction.getLocation() +30){
+                    writer.append("1E");
+                } else{
+                    writer.append(Integer.toHexString(instructions.get(instructions.size()-1).getLocation()-instruction.getLocation()));
+                }
+            }
+            
+            writer.append(instruction.getOperand());
+        }
+        writer.append("%n");
+        writer.append("E").append(Integer.toHexString(startingAddress));
     }
 
     public void writeFile(String filePath) {

@@ -11,11 +11,19 @@ package sicassembler;
  */
 public class Instruction {
 
-    public int location;
-    public String symbol;
-    public String mnemonic;
-    public String operand;
-    public boolean isIndexed = false;
+    private int location;
+    private String symbol;
+    private String mnemonic;
+    private String operand;
+    private boolean isIndexed = false;
+
+    public boolean isIsIndexed() {
+        return isIndexed;
+    }
+
+    public void setIsIndexed(boolean isIndexed) {
+        this.isIndexed = isIndexed;
+    }
 
     public int getLocation() {
         return location;
