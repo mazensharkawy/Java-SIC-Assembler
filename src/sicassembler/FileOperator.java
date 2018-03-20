@@ -27,7 +27,7 @@ public class FileOperator {
     int programLength ;
     public StringBuilder writer;
 
-    public void executeAssemblerPassOne(String filePath) {
+    public void executeAssemblerPathOne(String filePath) {
 
         FileReader fileReader = null;
         String[] tokens;
