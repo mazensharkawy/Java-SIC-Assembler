@@ -7,7 +7,10 @@ package sicassembler;
 public class SICAssembler {
 
     public static void main(String[] args) {
-        FileOperations.executeAssemblerPathOne("assembly.txt");
+        FileOperator operator = new FileOperator();
+               operator.executeAssemblerPathOne("assembly.txt");
+               
+        
     }
     
 }

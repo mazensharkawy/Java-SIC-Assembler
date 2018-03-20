@@ -11,13 +11,13 @@ import java.util.HashMap;
  *
  * @author ahmed
  */
-public class Setup {
+public class OpTable {
     
-    public static HashMap<String, String> symTable = new HashMap<>();
-    public static HashMap<String, String> opTable = new HashMap<>();
+    public final HashMap<String, String> opTable;
     
     
-    public static HashMap<String, String> setOpTable(){
+    public OpTable(){
+        opTable = new HashMap<>();
         
         opTable.put("ADD", "18");
         opTable.put("ADDF", "58");
@@ -77,9 +77,14 @@ public class Setup {
         opTable.put("STX", "10");
         opTable.put("SUB", "1C");
         opTable.put("SUBF", "5C");
-        
-        return opTable;
-
+}
+    
+    
+    public String getOpCode(String key){
+        if(opTable.containsKey(key)){
+            return opTable.get(key);
+        }
+        return "error";
     }
     
 }
