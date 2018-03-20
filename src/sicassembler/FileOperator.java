@@ -20,6 +20,7 @@ public class FileOperator {
 
     public int locationCounter;
     public int startingAddress;
+    public int programLength;
     public ArrayList<Instruction> instructions = new ArrayList<>();
     public HashMap<String, Integer> symTable = new HashMap<>();
 
@@ -48,6 +49,8 @@ public class FileOperator {
                     System.out.println(newLine);
                 }
             }
+            programLength = locationCounter-startingAddress;
+            
             reader.close();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(FileOperator.class.getName()).log(Level.SEVERE, null, ex);
@@ -94,7 +97,6 @@ public class FileOperator {
         Instruction instruction = new Instruction();
         String symbol = null;
         String opCode = null;
-        int location = -1;
         String operand = null;
         if (tokens.length == 1) {
 
@@ -123,14 +125,16 @@ public class FileOperator {
             if (symTable.containsKey(tokens[0])) {
                 System.out.println("ERROR, Duplicate Symbol");
             }
-            symTable.put(tokens[0], locationCounter);
+            symTable.put(symbol, locationCounter);
         }
-        instruction.setSymbol(opCode);
+        instruction.setSymbol(symbol);
         instruction.setMnemonic(opCode);
         instruction.setOperand(operand);
         instruction.setLocation(locationCounter);
-        instruction.isIndexed = isIndexed(operand);
-        locationCounter += 3;
+
+        instruction.setIsIndexed(isIndexed(operand));
+        incrementLocationCounter(opCode, operand);
+
         return instruction;
     }
 
@@ -139,6 +143,21 @@ public class FileOperator {
             return true;
         }
         return false;
+    }
+
+    private void incrementLocationCounter(String opCode, String operand) {
+
+        if (opCode.toUpperCase().equals("WORD")) {
+            locationCounter += 3;
+        } else if (opCode.toUpperCase().equals("BYTE")) {
+            addLengthToLocationCounter(operand);
+        } else if (opCode.toUpperCase().equals("RESB")) {
+            locationCounter += Integer.parseInt(operand);
+        } else if (opCode.toUpperCase().equals("RESW")) {
+            locationCounter += Integer.parseInt(operand) * 3;
+        } else {
+            locationCounter += 3;
+        }
     }
 
     private boolean parseFirstLine(String line) {
@@ -151,5 +170,21 @@ public class FileOperator {
         locationCounter = 0;
         return false;
 
+    }
+
+    private void addLengthToLocationCounter(String operand) {
+        String modifiedOperand = operand.replaceAll("\\s+", "");
+
+        if (modifiedOperand.toUpperCase().startsWith("C")) {
+            String substring = modifiedOperand.substring(2, modifiedOperand.length() - 1);
+            locationCounter += substring.length();
+
+        } else if (modifiedOperand.toUpperCase().startsWith("X")) {
+            String substring = modifiedOperand.substring(2, modifiedOperand.length() - 1);
+            locationCounter += substring.length() * 4;
+
+        } else {
+            System.out.println("WRONG FORMAT");
+        }
     }
 }
