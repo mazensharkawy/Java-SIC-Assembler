@@ -10,12 +10,12 @@ package sicassembler;
  * @author ahmed
  */
 public class Instruction {
+
     public int location;
     public String symbol;
     public String mnemonic;
     public String operand;
-    
-    
+    public boolean isIndexed = false;
 
     public int getLocation() {
         return location;
@@ -53,7 +53,5 @@ public class Instruction {
     public String toString() {
         return "Instruction{" + "location=" + location + ", symbol=" + symbol + ", mnemonic=" + mnemonic + ", operand=" + operand + '}';
     }
-    
-    
-    
+
 }

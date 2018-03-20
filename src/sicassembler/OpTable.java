@@ -13,12 +13,11 @@ import java.util.HashMap;
  */
 public class OpTable {
     
-    public final HashMap<String, String> opTable;
+    public static final HashMap<String, String> opTable = new HashMap<>();
     
     
     public OpTable(){
-        opTable = new HashMap<>();
-        
+
         opTable.put("ADD", "18");
         opTable.put("ADDF", "58");
         opTable.put("ADDR", "90");
@@ -79,12 +78,17 @@ public class OpTable {
         opTable.put("SUBF", "5C");
 }
     
+     public static boolean contains(String key){
+        return opTable.containsKey(key);
+    }
     
-    public String getOpCode(String key){
+    
+    
+    public static String getOpCode(String key){
         if(opTable.containsKey(key)){
             return opTable.get(key);
         }
-        return "error";
+        return null;
     }
     
 }
