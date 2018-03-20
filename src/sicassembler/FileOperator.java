@@ -22,8 +22,11 @@ public class FileOperator {
     public int startingAddress;
     public ArrayList<Instruction> instructions = new ArrayList<>();
     public HashMap<String, String> symTable = new HashMap<>();
+    public String programName;
+    int programLength ;
+    public StringBuilder writer;
 
-    public void executeAssemblerPathOne(String filePath) {
+    public void executeAssemblerPassOne(String filePath) {
 
         FileReader fileReader = null;
         String[] tokens;
@@ -60,6 +63,30 @@ public class FileOperator {
             }
         }
 
+    }
+    
+    public void executeAssemblerPassTwo(){
+//        OpTable opCodes = new OpTable();
+        writer=new StringBuilder();
+        writer.append("H").append(programName).append(" ")
+                .append(Integer.toHexString(startingAddress)).append(Integer.toHexString(programLength));
+        int t =10;
+        for(Instruction instruction : instructions ){
+            if(t==10){
+                t=0;
+                writer.append("%n");
+                writer.append("T").append(Integer.toHexString(instruction.location));
+                if(instructions.get(instructions.size()-1).location > instruction.location +30){
+                    writer.append("1E");
+                } else{
+                    writer.append(Integer.toHexString(instructions.get(instructions.size()-1).location-instruction.location));
+                }
+            }
+            
+            writer.append(instruction.operand);
+        }
+        writer.append("%n");
+        writer.append("E").append(Integer.toHexString(startingAddress));
     }
 
     public void writeFile(String filePath) {
