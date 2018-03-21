@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
  *
  * @author ahmed
  */
-public class FileOperator {
+public class Assembler {
 
     public int locationCounter;
     public int startingAddress;
@@ -30,7 +30,7 @@ public class FileOperator {
     public StringBuilder writer;
     private OpTable opTable = new OpTable();
 
-    public void executeAssemblerPassOne(String filePath) {
+    public void executePassOne(String filePath) {
 
         FileReader fileReader = null;
         String[] tokens;
@@ -53,27 +53,25 @@ public class FileOperator {
                     Instruction newInstruction = parseLine(newLine);
                     instructions.add(newInstruction);
                     System.out.println(newInstruction);
-
-                    //System.out.println(locationCounter+"    "+newLine);
                 }
             }
             programLength = locationCounter - startingAddress;
 
             reader.close();
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(FileOperator.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Assembler.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
         } finally {
             try {
                 fileReader.close();
             } catch (IOException ex) {
-                Logger.getLogger(FileOperator.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Assembler.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
 
     }
     
-    public void executeAssemblerPassTwo(){
+    public void executePassTwo(){
         OpTable opCodes = new OpTable();
         writer=new StringBuilder();
         writer.append("H").append(programName).append(" ") 
@@ -133,7 +131,7 @@ public class FileOperator {
             writer.write("hi");
             writer.close();
         } catch (IOException ex) {
-            Logger.getLogger(FileOperator.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Assembler.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
@@ -242,6 +240,7 @@ public class FileOperator {
         if (tokens.length == 3 && "START".equals(tokens[1].toUpperCase())) {
             startingAddress = Integer.parseInt(tokens[2],16);
             locationCounter = Integer.parseInt(tokens[2],16);
+            programName = tokens[0].trim().toUpperCase();
             return true;
         }
         locationCounter = 0;
@@ -264,6 +263,7 @@ public class FileOperator {
             throw new RuntimeException("ERROR, Wrong format");
         }
     }
+    
     private String formatHexa(String hexa,int length){
         String out ="";
         for(int i =0;i< length - hexa.length();i++){out+="0";}
