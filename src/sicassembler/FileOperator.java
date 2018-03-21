@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -26,8 +28,9 @@ public class FileOperator {
     public HashMap<String, Integer> symTable = new HashMap<>();
     public String programName;
     public StringBuilder writer;
+    private OpTable opTable = new OpTable();
 
-    public void executeAssemblerPathOne(String filePath) {
+    public void executeAssemblerPassOne(String filePath) {
 
         FileReader fileReader = null;
         String[] tokens;
@@ -47,13 +50,15 @@ public class FileOperator {
                     continue;
                 }
                 if (isValidAssemblyLine(newLine)) {
-                    instructions.add(parseLine(newLine));
+                    Instruction newInstruction = parseLine(newLine);
+                    instructions.add(newInstruction);
+                    System.out.println(newInstruction);
 
-                    System.out.println(newLine);
+                    //System.out.println(locationCounter+"    "+newLine);
                 }
             }
-            programLength = locationCounter-startingAddress;
-            
+            programLength = locationCounter - startingAddress;
+
             reader.close();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(FileOperator.class.getName()).log(Level.SEVERE, null, ex);
@@ -77,9 +82,9 @@ public class FileOperator {
         for(Instruction instruction : instructions ){
             if(t==30){
                 t=0;
-                writer.append("%n");
+                writer.append("\n");
                 writer.append("T").append(Integer.toHexString(instruction.getLocation()));
-                if(instructions.get(instructions.size()-1).getLocation() > instruction.getLocation() +30){
+                if (instructions.get(instructions.size() - 1).getLocation() > instruction.getLocation() + 30) {
                     writer.append("1E");
                 } else if(instructions.get(instructions.size()-1).getLocation() > instruction.getLocation() +15){
                     writer.append(Integer.toHexString(instructions.get(instructions.size()-1).getLocation()-instruction.getLocation()));
@@ -89,17 +94,34 @@ public class FileOperator {
                     writer.append(Integer.toHexString(instructions.get(instructions.size()-1).getLocation()-instruction.getLocation()));   
                 }
             }
+            System.out.println(instruction.getOperand());
             if(instruction.getMnemonic()!=null) writer.append(opCodes.getOpCode(instruction.getMnemonic()));
-            if(symTable.get(instruction.getOperand())!=null){
+            
+            if(instruction.getOperand() == null) {
+                writer.append(0000);
+            }
+            else if(instruction.getOperand().charAt(0)>= '0' && instruction.getOperand().charAt(0)<= '9' ){
+                String hexaOperand = Integer.toHexString(Integer.parseInt(instruction.getOperand()));
+                for(int i =0;i< 4- hexaOperand.length();i++){writer.append(0);}
+                writer.append(hexaOperand);
+            }
+            else if(symTable.get(instruction.getOperand())!=null){
                writer.append(symTable.get(instruction.getOperand()));
             }
             else if(instruction.getOperand().substring(0, 2).equalsIgnoreCase("x'") 
                     && instruction.getOperand().charAt(instruction.getOperand().length()-1)=='\''){
-                writer.append(instruction.getOperand());
+                writer.append(instruction.getOperand().substring(2,instruction.getOperand().length()));
+            }
+            else if(instruction.getOperand().substring(0, 2).equalsIgnoreCase("c'") 
+                    && instruction.getOperand().charAt(instruction.getOperand().length()-1)=='\''){
+                for(char c : instruction.getOperand().substring(2,instruction.getOperand().length()).toCharArray()){
+                    int ascii = (char) c;
+                    writer.append(Integer.toHexString(ascii));
+                }
             }
             
         }
-        writer.append("%n");
+        writer.append("\n");
         writer.append("E").append(Integer.toHexString(startingAddress));
     }
 
@@ -117,12 +139,19 @@ public class FileOperator {
     }
 
     private boolean isValidAssemblyLine(String line) {
-        //TODO regex validation
+//        String pattern = "^\\s*\\w{1,5}+\\s*\\w*,?\\w*,?\\w*\\s*\\w*'?,?\\w*'?\\s*$";
+//        Pattern r = Pattern.compile(pattern);
+//        Matcher m = r.matcher(line);
+//      if (m.find()) {
+//          System.out.println("MAtched");
+//          return true;
+//      }
+//        System.out.println(line);
+//        System.out.println("not matched!!!!!!!!!!!!!!!!!!!!!");
         return true;
     }
 
     private boolean startWith(String line, String key) {
-        String st = line.trim().split("\\s+")[0];
         if (line.trim().split("\\s+")[0].equals(key)) {
             return true;
         }
@@ -138,30 +167,30 @@ public class FileOperator {
         String operand = null;
         if (tokens.length == 1) {
 
-            if (!OpTable.contains(tokens[0])) {
+            if (opTable.contains(tokens[0])) {
                 opCode = tokens[0];
             } else {
-                System.out.println("Error, OpCode is incorrect");
+                throw new RuntimeException("ERROR, Unrecognised Mnemonic");
             }
 
         } else if (tokens.length == 2) {
 
-            if (!OpTable.contains(tokens[0])) {
+            if (opTable.contains(tokens[0])) {
                 opCode = tokens[0];
                 operand = tokens[1];
             } else {
-                System.out.println("Error, OpCode is incorrect");
+                throw new RuntimeException("ERROR, Unrecognised Mnemonic");
             }
         } else if (tokens.length == 3) {
-            if (!OpTable.contains(tokens[0])) {
+            if (opTable.contains(tokens[1]) || isValidDirective(tokens[1])) {
                 symbol = tokens[0];
                 opCode = tokens[1];
                 operand = tokens[2];
             } else {
-                System.out.println("Error, OpCode is incorrect");
+                throw new RuntimeException("ERROR, Unrecognised Mnemonic");
             }
             if (symTable.containsKey(tokens[0])) {
-                System.out.println("ERROR, Duplicate Symbol");
+                throw new RuntimeException("ERROR, Duplicate Symbol");
             }
             symTable.put(symbol, locationCounter);
         }
@@ -176,8 +205,13 @@ public class FileOperator {
         return instruction;
     }
 
+    private boolean isValidDirective(String opCode) {
+        String newOpCode = opCode.trim().toUpperCase();
+        return ("BYTE".equals(newOpCode) || "WORD".equals(newOpCode) || "RESW".equals(newOpCode) || "RESB".equals(newOpCode));
+    }
+
     private boolean isIndexed(String operand) {
-        if (operand != null && operand.replaceAll("\\s+", "").toUpperCase().contains(",X")) {
+        if (operand != null && operand.replaceAll("\\s+", "").toUpperCase().endsWith(",X")) {
             return true;
         }
         return false;
@@ -222,7 +256,7 @@ public class FileOperator {
             locationCounter += substring.length() * 4;
 
         } else {
-            System.out.println("WRONG FORMAT");
+            throw new RuntimeException("ERROR, Wrong format");
         }
     }
 }

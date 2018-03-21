@@ -8,9 +8,9 @@ public class SICAssembler {
 
     public static void main(String[] args) {
         FileOperator operator = new FileOperator();
-        operator.executeAssemblerPathOne("wrongassembly.txt");
-               
-        
+        operator.executeAssemblerPassOne("assembly.txt");
+        operator.executeAssemblerPassTwo();
+        System.out.println(operator.writer);
     }
     
 }
