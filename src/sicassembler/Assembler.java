@@ -110,7 +110,7 @@ public class Assembler {
             }
 
             if (instruction.getOperand() == null) {
-                writer.append(0000);
+                writer.append("0000");
             } else if (instruction.getOperand().charAt(0) >= '0' && instruction.getOperand().charAt(0) <= '9') {
                 String hexaOperand = Integer.toHexString(Integer.parseInt(instruction.getOperand()));
                 writer.append(formatHexa(hexaOperand, 6));

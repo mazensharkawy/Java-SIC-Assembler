@@ -52,7 +52,7 @@ public class OpTable {
         opTable.put("OR", "C8");
         opTable.put("RD", "44");
         opTable.put("RMO", "D8");
-        opTable.put("RSUB", "AC");
+        opTable.put("RSUB", "4C");
         opTable.put("SHIFTL", "4C");
         opTable.put("SHIFTR", "A8");
         opTable.put("SIO", "F0");
