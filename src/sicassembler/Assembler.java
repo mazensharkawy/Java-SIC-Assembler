@@ -80,7 +80,7 @@ public class Assembler {
                 .append(formatHexa(Integer.toHexString(startingAddress), 6)).append(" ").append(formatHexa(Integer.toHexString(programLength), 6));
         int t = 30;
         for (Instruction instruction : instructions) {
-            if (t == 30) {
+            if (t >= 28) {
                 t = 0;
                 writer.append("\n");
                 writer.append("T").append(Integer.toHexString(instruction.getLocation()));
@@ -116,7 +116,15 @@ public class Assembler {
                     int ascii = (char) c;
                     writer.append(Integer.toHexString(ascii));
                 }
-            } else {
+            } else if (instruction.getOperand().contains(",") 
+                    && (instruction.getOperand().contains("x")) || instruction.getOperand().contains("X")){
+                
+                String[] currentOperands = instruction.getOperand().split("\\,");
+                int address =symTable.get(currentOperands[0])+32768;
+                writer.append(Integer.toHexString(address));
+                
+            }
+            else {
 //                JOptionPane.showMessageDialog(new JFrame(), 
 //                        "Assembling Error: Unknown Operand \"" + instruction.getOperand(), "Dialog",
 //                JOptionPane.ERROR_MESSAGE);
