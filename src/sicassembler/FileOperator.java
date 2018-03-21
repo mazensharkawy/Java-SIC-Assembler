@@ -76,8 +76,8 @@ public class FileOperator {
     public void executeAssemblerPassTwo(){
         OpTable opCodes = new OpTable();
         writer=new StringBuilder();
-        writer.append("H").append(programName).append(" ")
-                .append(Integer.toHexString(startingAddress)).append(Integer.toHexString(programLength));
+        writer.append("H").append(programName).append(" ") 
+                .append(Integer.toHexString(startingAddress)).append(formatHexa(Integer.toHexString(programLength),4));
         int t =30;
         for(Instruction instruction : instructions ){
             if(t==30){
@@ -94,16 +94,16 @@ public class FileOperator {
                     writer.append(Integer.toHexString(instructions.get(instructions.size()-1).getLocation()-instruction.getLocation()));   
                 }
             }
-            System.out.println(instruction.getOperand());
-            if(instruction.getMnemonic()!=null) writer.append(opCodes.getOpCode(instruction.getMnemonic()));
+            System.out.println(instruction.getMnemonic()+"\t"+instruction.getOperand());
+            if(opCodes.getOpCode(instruction.getMnemonic())!=null) writer.append(opCodes.getOpCode(instruction.getMnemonic()));
             
             if(instruction.getOperand() == null) {
                 writer.append(0000);
             }
             else if(instruction.getOperand().charAt(0)>= '0' && instruction.getOperand().charAt(0)<= '9' ){
                 String hexaOperand = Integer.toHexString(Integer.parseInt(instruction.getOperand()));
-                for(int i =0;i< 4- hexaOperand.length();i++){writer.append(0);}
-                writer.append(hexaOperand);
+                
+                writer.append(formatHexa(hexaOperand, 4));
             }
             else if(symTable.get(instruction.getOperand())!=null){
                writer.append(symTable.get(instruction.getOperand()));
@@ -263,5 +263,10 @@ public class FileOperator {
         } else {
             throw new RuntimeException("ERROR, Wrong format");
         }
+    }
+    private String formatHexa(String hexa,int length){
+        String out ="";
+        for(int i =0;i< length - hexa.length();i++){out+="0";}
+        return out+hexa;
     }
 }
