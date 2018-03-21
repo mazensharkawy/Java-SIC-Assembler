@@ -50,10 +50,10 @@ public class OpTable {
         opTable.put("MULR", "60");
         opTable.put("NORM", "98");
         opTable.put("OR", "C8");
-        opTable.put("RD", "44");
-        opTable.put("RMO", "D8");
+        opTable.put("RD", "D8");
+        opTable.put("RMO", "A8");
         opTable.put("RSUB", "4C");
-        opTable.put("SHIFTL", "4C");
+        opTable.put("SHIFTL", "A4");
         opTable.put("SHIFTR", "A8");
         opTable.put("SIO", "F0");
         opTable.put("SUBR", "94");

@@ -134,10 +134,11 @@ public class Assembler {
                 writer.append(Integer.toHexString(address));
 
             } else {
-//                JOptionPane.showMessageDialog(new JFrame(), 
-//                        "Assembling Error: Unknown Operand \"" + instruction.getOperand(), "Dialog",
-//                JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(new JFrame(), 
+                        "Assembling Error: Unknown Operand \"" + instruction.getOperand(), "Dialog",
+                JOptionPane.ERROR_MESSAGE);
                 writer.append("0000"); // to be removed
+                return;
             }
             writer.append(" ");
             t += 2;
