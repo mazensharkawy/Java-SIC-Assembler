@@ -69,24 +69,35 @@ public class FileOperator {
     }
     
     public void executeAssemblerPassTwo(){
-//        OpTable opCodes = new OpTable();
+        OpTable opCodes = new OpTable();
         writer=new StringBuilder();
         writer.append("H").append(programName).append(" ")
                 .append(Integer.toHexString(startingAddress)).append(Integer.toHexString(programLength));
-        int t =10;
+        int t =30;
         for(Instruction instruction : instructions ){
-            if(t==10){
+            if(t==30){
                 t=0;
                 writer.append("%n");
                 writer.append("T").append(Integer.toHexString(instruction.getLocation()));
                 if(instructions.get(instructions.size()-1).getLocation() > instruction.getLocation() +30){
                     writer.append("1E");
-                } else{
+                } else if(instructions.get(instructions.size()-1).getLocation() > instruction.getLocation() +15){
                     writer.append(Integer.toHexString(instructions.get(instructions.size()-1).getLocation()-instruction.getLocation()));
                 }
+                else{
+                    writer.append(0);
+                    writer.append(Integer.toHexString(instructions.get(instructions.size()-1).getLocation()-instruction.getLocation()));   
+                }
+            }
+            if(instruction.getMnemonic()!=null) writer.append(opCodes.getOpCode(instruction.getMnemonic()));
+            if(symTable.get(instruction.getOperand())!=null){
+               writer.append(symTable.get(instruction.getOperand()));
+            }
+            else if(instruction.getOperand().substring(0, 2).equalsIgnoreCase("x'") 
+                    && instruction.getOperand().charAt(instruction.getOperand().length()-1)=='\''){
+                writer.append(instruction.getOperand());
             }
             
-            writer.append(instruction.getOperand());
         }
         writer.append("%n");
         writer.append("E").append(Integer.toHexString(startingAddress));
