@@ -10,7 +10,7 @@ public class SICAssembler {
         Assembler assembler = new Assembler();
         assembler.executePassOne("assembly.txt");
         assembler.executePassTwo();
-        System.out.println(assembler.writer);
+        //System.out.println(assembler.writer);
     }
     
 }
