@@ -139,16 +139,21 @@ public class FileOperator {
     }
 
     private boolean isValidAssemblyLine(String line) {
-//        String pattern = "^\\s*\\w{1,5}+\\s*\\w*,?\\w*,?\\w*\\s*\\w*'?,?\\w*'?\\s*$";
-//        Pattern r = Pattern.compile(pattern);
-//        Matcher m = r.matcher(line);
-//      if (m.find()) {
-//          System.out.println("MAtched");
-//          return true;
-//      }
-//        System.out.println(line);
-//        System.out.println("not matched!!!!!!!!!!!!!!!!!!!!!");
-        return true;
+        String pattern1 = "^\\s*\\w{1,5}+\\s*$";
+        String pattern2 = "^\\s*\\w{1,5}+\\s*\\w+(,\\w+)?\\s*$";
+        String pattern3 = "^\\s*\\w+\\s*\\w+\\s*\\w+((,X)|('\\w+'))?\\s*$";
+        Pattern r1 = Pattern.compile(pattern1);
+        Matcher m1 = r1.matcher(line);
+        Pattern r2 = Pattern.compile(pattern2);
+        Matcher m2 = r2.matcher(line);
+        Pattern r3 = Pattern.compile(pattern3);
+        Matcher m3 = r3.matcher(line);
+      if (m1.find()||m2.find()||m3.find()) {
+          return true;
+      }
+        System.out.println(line);
+        System.out.println("Assembly line is incorrect");
+        throw new RuntimeException("ERROR, Assembly instruction is incorrect");
     }
 
     private boolean startWith(String line, String key) {
@@ -235,8 +240,8 @@ public class FileOperator {
     private boolean parseFirstLine(String line) {
         String[] tokens = line.trim().split("\\s+");
         if (tokens.length == 3 && "START".equals(tokens[1].toUpperCase())) {
-            startingAddress = Integer.parseInt(tokens[2]);
-            locationCounter = Integer.parseInt(tokens[2]);
+            startingAddress = Integer.parseInt(tokens[2],16);
+            locationCounter = Integer.parseInt(tokens[2],16);
             return true;
         }
         locationCounter = 0;
