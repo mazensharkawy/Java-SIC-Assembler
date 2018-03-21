@@ -79,7 +79,9 @@ public class Assembler {
         writer.append("H").append(programName).append(" ")
                 .append(formatHexa(Integer.toHexString(startingAddress), 6)).append(" ").append(formatHexa(Integer.toHexString(programLength), 6));
         int t = 30;
-        for (Instruction instruction : instructions) {
+        System.out.println("!!!!!!!!!!!!!!" + getSizeOfT(40));
+        for (int i = 0; i < instructions.size(); i++) {
+            Instruction instruction = instructions.get(i);
             if (t >= 28) {
                 t = 0;
                 writer.append("\n");
@@ -116,15 +118,14 @@ public class Assembler {
                     int ascii = (char) c;
                     writer.append(Integer.toHexString(ascii));
                 }
-            } else if (instruction.getOperand().contains(",") 
-                    && (instruction.getOperand().contains("x")) || instruction.getOperand().contains("X")){
-                
+            } else if (instruction.getOperand().contains(",")
+                    && (instruction.getOperand().contains("x")) || instruction.getOperand().contains("X")) {
+
                 String[] currentOperands = instruction.getOperand().split("\\,");
-                int address =symTable.get(currentOperands[0])+32768;
+                int address = symTable.get(currentOperands[0]) + 32768;
                 writer.append(Integer.toHexString(address));
-                
-            }
-            else {
+
+            } else {
 //                JOptionPane.showMessageDialog(new JFrame(), 
 //                        "Assembling Error: Unknown Operand \"" + instruction.getOperand(), "Dialog",
 //                JOptionPane.ERROR_MESSAGE);
@@ -195,21 +196,38 @@ public class Assembler {
         return false;
     }
 
-    private String getSizeOfT(int startIndex) {
+    private String getSizeOfT(int startIndex) {//args is the index of first instruction in the T line
         int count = 0;
-        for (int i = startIndex; i < instructions.size(); i++) {
-
+        int lastOperation = 0;
+        for (int i = startIndex; i < instructions.size() && count < 30; i++) {
             if ("RESW".equals(instructions.get(i).getMnemonic()) || "RESB".equals(instructions.get(i).getMnemonic())) {
-                if (count <= 10) {
-                    return Integer.toHexString(count);
-                } else {
-                    return "1E";
+                if (count == 0) {
+                    continue;
                 }
+                return Integer.toHexString(count).toUpperCase();
+
+            } else if ("BYTE".equals(instructions.get(i).getMnemonic())) {
+                if (instructions.get(i).getOperand().startsWith("X")) {
+                    lastOperation = 1;
+                    count++;
+                    
+                } else if (instructions.get(i).getOperand().startsWith("C")) {
+                    String substring = instructions.get(i).getOperand().substring(2, instructions.get(i).getOperand().length() - 1);
+                    count += substring.length();
+                    lastOperation = substring.length();
+                }
+            } else {
+                count += 3;
+                lastOperation = 3;
             }
-            count++;
         }
-        if (count <= 10) {
-            return Integer.toHexString(count);
+        if (count <= 30) {
+            return Integer.toHexString(count).toUpperCase();
+
+        } else if (count > 30) {
+            System.out.println(count);
+            System.out.println(lastOperation);
+            return Integer.toHexString(count - lastOperation).toUpperCase();
         } else {
             return "1E";
         }
