@@ -76,34 +76,35 @@ public class Assembler {
     public void executePassTwo() {
         OpTable opCodes = new OpTable();
         writer = new StringBuilder();
-        writer.append("H").append(programName).append(" ")
+        writer.append("H").append(" ").append(programName).append(" ")
                 .append(formatHexa(Integer.toHexString(startingAddress), 6)).append(" ").append(formatHexa(Integer.toHexString(programLength), 6));
         int t = 30;
-        System.out.println("!!!!!!!!!!!!!!" + getSizeOfT(40));
         for (int i = 0; i < instructions.size(); i++) {
             Instruction instruction = instructions.get(i);
             if (t >= 28) {
                 if (instruction.getMnemonic().equalsIgnoreCase("RESW")
-                    ||instruction.getMnemonic().equalsIgnoreCase("RESB")) continue;
+                        || instruction.getMnemonic().equalsIgnoreCase("RESB")) {
+                    continue;
+                }
                 t = 0;
                 writer.append("\n");
-                writer.append("T ").append(Integer.toHexString(instruction.getLocation()));
-                if (instructions.get(instructions.size() - 1).getLocation() > instruction.getLocation() + 30) {
-                    writer.append("1E");
-                } else if (instructions.get(instructions.size() - 1).getLocation() > instruction.getLocation() + 15) {
-                    writer.append(Integer.toHexString(instructions.get(instructions.size() - 1).getLocation() - instruction.getLocation()));
-                } else {
-                    writer.append(0);
-                    writer.append(Integer.toHexString(instructions.get(instructions.size() - 1).getLocation() - instruction.getLocation()));
-                }
+                writer.append("T ").append(formatHexa(Integer.toHexString(instruction.getLocation()), 6)).append(" ");
+//                if (instructions.get(instructions.size() - 1).getLocation() > instruction.getLocation() + 30) {
+//                    writer.append("1E");
+//                } else if (instructions.get(instructions.size() - 1).getLocation() > instruction.getLocation() + 15) {
+//                    writer.append(Integer.toHexString(instructions.get(instructions.size() - 1).getLocation() - instruction.getLocation()));
+//                } else {
+//                    writer.append(0);
+//                    writer.append(Integer.toHexString(instructions.get(instructions.size() - 1).getLocation() - instruction.getLocation()));
+//                }
+                writer.append(formatHexa(getSizeOfT(i),2)).append(" ");
             }
             System.out.println(((instruction.getSymbol() == null) ? "\t\t" : instruction.getSymbol() + "\t") + instruction.getMnemonic() + "\t" + instruction.getOperand());
             if (opCodes.getOpCode(instruction.getMnemonic()) != null) {
                 writer.append(opCodes.getOpCode(instruction.getMnemonic()));
                 t++;
-            }
-            else if (instruction.getMnemonic().equalsIgnoreCase("RESW")
-                    ||instruction.getMnemonic().equalsIgnoreCase("RESB")){
+            } else if (instruction.getMnemonic().equalsIgnoreCase("RESW")
+                    || instruction.getMnemonic().equalsIgnoreCase("RESB")) {
                 t = 30;
                 continue;
             }
@@ -138,46 +139,14 @@ public class Assembler {
 //                JOptionPane.ERROR_MESSAGE);
                 writer.append("0000"); // to be removed
             }
+            writer.append(" ");
             t += 2;
         }
         writer.append("\n");
-        writer.append("E").append(Integer.toHexString(startingAddress));
+        writer.append("E").append(" ").append(formatHexa(Integer.toHexString(startingAddress),6));
     }
 
-    public void writeFile(String filePath) {
-        ArrayList<String> objectCodes = new ArrayList<>();
-        try {
-            FileWriter filewriter = new FileWriter("objectCode.txt");
-            BufferedWriter writer = new BufferedWriter(filewriter);
-
-            writer.append("H").append(programName).append(" ")
-                    .append(formatHexa(Integer.toHexString(startingAddress), 6)).append(" ")
-                    .append(formatHexa(Integer.toHexString(programLength), 6));
-            writer.newLine();
-            System.out.println("size of T 0: " + getSizeOfT(0));
-            writer.append("T ").append(Integer.toHexString(instructions.get(0).getLocation())).append(" ").append(getSizeOfT(0));
-            int objectsCount = 0;
-            for (int i = 0; i < instructions.size(); i++) {
-                Instruction instruction = instructions.get(i);
-                if (objectsCount++ < 10) {
-                    writer.append(instruction.getMnemonic());
-                    if (instruction.getOperand() != null || symTable.containsKey(instruction.getOperand())) {
-                        writer.append(Integer.toHexString(symTable.get(instruction.getOperand())));
-                    }
-                } else {
-                    writer.newLine();
-                    writer.append("T ");
-                    continue;
-                }
-            }
-
-            writer.close();
-        } catch (IOException ex) {
-            Logger.getLogger(Assembler.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-    }
-
+    
     private boolean isValidAssemblyLine(String line) {
         String pattern1 = "^\\s*\\w{1,5}+\\s*$";
         String pattern2 = "^\\s*\\w{1,5}+\\s*\\w+(,\\w+)?\\s*$";
@@ -217,7 +186,7 @@ public class Assembler {
                 if (instructions.get(i).getOperand().startsWith("X")) {
                     lastOperation = 1;
                     count++;
-                    
+
                 } else if (instructions.get(i).getOperand().startsWith("C")) {
                     String substring = instructions.get(i).getOperand().substring(2, instructions.get(i).getOperand().length() - 1);
                     count += substring.length();
@@ -350,4 +319,39 @@ public class Assembler {
         }
         return out + hexa;
     }
+    
+    public void writeFile(String filePath) {
+        ArrayList<String> objectCodes = new ArrayList<>();
+        try {
+            FileWriter filewriter = new FileWriter("objectCode.txt");
+            BufferedWriter writer = new BufferedWriter(filewriter);
+
+            writer.append("H").append(programName).append(" ")
+                    .append(formatHexa(Integer.toHexString(startingAddress), 6)).append(" ")
+                    .append(formatHexa(Integer.toHexString(programLength), 6));
+            writer.newLine();
+            System.out.println("size of T 0: " + getSizeOfT(0));
+            writer.append("T ").append(Integer.toHexString(instructions.get(0).getLocation())).append(" ").append(getSizeOfT(0));
+            int objectsCount = 0;
+            for (int i = 0; i < instructions.size(); i++) {
+                Instruction instruction = instructions.get(i);
+                if (objectsCount++ < 10) {
+                    writer.append(instruction.getMnemonic());
+                    if (instruction.getOperand() != null || symTable.containsKey(instruction.getOperand())) {
+                        writer.append(Integer.toHexString(symTable.get(instruction.getOperand())));
+                    }
+                } else {
+                    writer.newLine();
+                    writer.append("T ");
+                    continue;
+                }
+            }
+
+            writer.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Assembler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
 }
