@@ -87,7 +87,7 @@ public class Assembler {
                     ||instruction.getMnemonic().equalsIgnoreCase("RESB")) continue;
                 t = 0;
                 writer.append("\n");
-                writer.append("T").append(Integer.toHexString(instruction.getLocation()));
+                writer.append("T ").append(Integer.toHexString(instruction.getLocation()));
                 if (instructions.get(instructions.size() - 1).getLocation() > instruction.getLocation() + 30) {
                     writer.append("1E");
                 } else if (instructions.get(instructions.size() - 1).getLocation() > instruction.getLocation() + 15) {
