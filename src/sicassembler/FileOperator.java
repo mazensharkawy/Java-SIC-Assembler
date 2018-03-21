@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -109,12 +111,19 @@ public class FileOperator {
     }
 
     private boolean isValidAssemblyLine(String line) {
-        //TODO regex validation
+//        String pattern = "^\\s*\\w{1,5}+\\s*\\w*,?\\w*,?\\w*\\s*\\w*'?,?\\w*'?\\s*$";
+//        Pattern r = Pattern.compile(pattern);
+//        Matcher m = r.matcher(line);
+//      if (m.find()) {
+//          System.out.println("MAtched");
+//          return true;
+//      }
+//        System.out.println(line);
+//        System.out.println("not matched!!!!!!!!!!!!!!!!!!!!!");
         return true;
     }
 
     private boolean startWith(String line, String key) {
-        String st = line.trim().split("\\s+")[0];
         if (line.trim().split("\\s+")[0].equals(key)) {
             return true;
         }
@@ -174,7 +183,7 @@ public class FileOperator {
     }
 
     private boolean isIndexed(String operand) {
-        if (operand != null && operand.replaceAll("\\s+", "").toUpperCase().contains(",X")) {
+        if (operand != null && operand.replaceAll("\\s+", "").toUpperCase().endsWith(",X")) {
             return true;
         }
         return false;
@@ -219,7 +228,7 @@ public class FileOperator {
             locationCounter += substring.length() * 4;
 
         } else {
-            System.out.println("WRONG FORMAT");
+            throw new RuntimeException("ERROR, Wrong format");
         }
     }
 }
