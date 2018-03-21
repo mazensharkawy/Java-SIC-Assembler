@@ -81,6 +81,8 @@ public class Assembler {
         int t = 30;
         for (Instruction instruction : instructions) {
             if (t >= 28) {
+                if (instruction.getMnemonic().equalsIgnoreCase("RESW")
+                    ||instruction.getMnemonic().equalsIgnoreCase("RESB")) continue;
                 t = 0;
                 writer.append("\n");
                 writer.append("T").append(Integer.toHexString(instruction.getLocation()));
@@ -97,6 +99,11 @@ public class Assembler {
             if (opCodes.getOpCode(instruction.getMnemonic()) != null) {
                 writer.append(opCodes.getOpCode(instruction.getMnemonic()));
                 t++;
+            }
+            else if (instruction.getMnemonic().equalsIgnoreCase("RESW")
+                    ||instruction.getMnemonic().equalsIgnoreCase("RESB")){
+                t = 30;
+                continue;
             }
 
             if (instruction.getOperand() == null) {
