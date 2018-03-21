@@ -212,8 +212,8 @@ public class FileOperator {
     private boolean parseFirstLine(String line) {
         String[] tokens = line.trim().split("\\s+");
         if (tokens.length == 3 && "START".equals(tokens[1].toUpperCase())) {
-            startingAddress = Integer.parseInt(tokens[2]);
-            locationCounter = Integer.parseInt(tokens[2]);
+            startingAddress = Integer.parseInt(tokens[2],16);
+            locationCounter = Integer.parseInt(tokens[2],16);
             return true;
         }
         locationCounter = 0;
