@@ -13,6 +13,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -72,10 +74,11 @@ public class Assembler {
     }
     
     public void executePassTwo(){
+        System.out.println(symTable.get("RETADR"));
         OpTable opCodes = new OpTable();
         writer=new StringBuilder();
-        writer.append("H").append(programName).append(" ")
-                .append(Integer.toHexString(startingAddress)).append(Integer.toHexString(programLength));
+        writer.append("H").append(programName).append(" ") 
+                .append(Integer.toHexString(startingAddress)).append(formatHexa(Integer.toHexString(programLength),4));
         int t =30;
         for(Instruction instruction : instructions ){
             if(t==30){
@@ -92,32 +95,41 @@ public class Assembler {
                     writer.append(Integer.toHexString(instructions.get(instructions.size()-1).getLocation()-instruction.getLocation()));   
                 }
             }
-            System.out.println(instruction.getOperand());
-            if(instruction.getMnemonic()!=null) writer.append(opCodes.getOpCode(instruction.getMnemonic()));
+            System.out.println(((instruction.getSymbol() == null)? "\t\t":instruction.getSymbol()+"\t")+instruction.getMnemonic()+"\t"+instruction.getOperand());
+            if(opCodes.getOpCode(instruction.getMnemonic())!=null){
+                writer.append(opCodes.getOpCode(instruction.getMnemonic()));
+                t++;
+            }
             
             if(instruction.getOperand() == null) {
                 writer.append(0000);
             }
             else if(instruction.getOperand().charAt(0)>= '0' && instruction.getOperand().charAt(0)<= '9' ){
                 String hexaOperand = Integer.toHexString(Integer.parseInt(instruction.getOperand()));
-                for(int i =0;i< 4- hexaOperand.length();i++){writer.append(0);}
-                writer.append(hexaOperand);
+                writer.append(formatHexa(hexaOperand, 6));
+                t++;
             }
             else if(symTable.get(instruction.getOperand())!=null){
-               writer.append(symTable.get(instruction.getOperand()));
+               writer.append(formatHexa(Integer.toHexString(symTable.get(instruction.getOperand())),4));
             }
             else if(instruction.getOperand().substring(0, 2).equalsIgnoreCase("x'") 
                     && instruction.getOperand().charAt(instruction.getOperand().length()-1)=='\''){
-                writer.append(instruction.getOperand().substring(2,instruction.getOperand().length()));
+                writer.append(instruction.getOperand().substring(2,instruction.getOperand().length()-1));
             }
             else if(instruction.getOperand().substring(0, 2).equalsIgnoreCase("c'") 
                     && instruction.getOperand().charAt(instruction.getOperand().length()-1)=='\''){
-                for(char c : instruction.getOperand().substring(2,instruction.getOperand().length()).toCharArray()){
+                for(char c : instruction.getOperand().substring(2,instruction.getOperand().length()-1).toCharArray()){
                     int ascii = (char) c;
                     writer.append(Integer.toHexString(ascii));
                 }
             }
-            
+            else{
+//                JOptionPane.showMessageDialog(new JFrame(), 
+//                        "Assembling Error: Unknown Operand \"" + instruction.getOperand(), "Dialog",
+//                JOptionPane.ERROR_MESSAGE);
+                writer.append("0000"); // to be removed
+            }
+            t+=2;
         }
         writer.append("\n");
         writer.append("E").append(Integer.toHexString(startingAddress));
@@ -262,5 +274,11 @@ public class Assembler {
         } else {
             throw new RuntimeException("ERROR, Wrong format");
         }
+    }
+    
+    private String formatHexa(String hexa,int length){
+        String out ="";
+        for(int i =0;i< length - hexa.length();i++){out+="0";}
+        return out+hexa;
     }
 }
