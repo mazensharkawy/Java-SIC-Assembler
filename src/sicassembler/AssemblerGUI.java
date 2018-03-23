@@ -7,7 +7,6 @@ package sicassembler;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.nio.file.Files;
 import java.util.Scanner;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -114,10 +113,7 @@ public class AssemblerGUI extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         if (isAssembled) {
-            JOptionPane.showMessageDialog(new JFrame(),
-                    "Code Already Assembled", "Dialog",
-                    JOptionPane.ERROR_MESSAGE);
-            return;
+            assembler = new Assembler();
         }
         if(selectedFile==null){
              JOptionPane.showMessageDialog(new JFrame(),
@@ -125,6 +121,7 @@ public class AssemblerGUI extends javax.swing.JFrame {
                     JOptionPane.ERROR_MESSAGE);
             return;
         }
+        saveChanges();
         assembler.executePassOne(selectedFile.getAbsolutePath());
         assembler.executePassTwo();
         jTextArea2.setText(assembler.writer.toString());
@@ -156,14 +153,7 @@ public class AssemblerGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        try{
-        byte data[] = jTextArea1.getText().getBytes();
-        FileOutputStream out = new FileOutputStream(selectedFile);
-        out.write(data);
-        out.close();
-        } catch(Exception E) {
-            
-        }
+        saveChanges();
     }//GEN-LAST:event_jButton3ActionPerformed
 
     /**
@@ -213,4 +203,15 @@ public class AssemblerGUI extends javax.swing.JFrame {
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextArea jTextArea2;
     // End of variables declaration//GEN-END:variables
+
+    private void saveChanges() {
+        try{
+            byte data[] = jTextArea1.getText().getBytes();
+            FileOutputStream out = new FileOutputStream(selectedFile);
+            out.write(data);
+            out.close();
+        } catch(Exception E) {
+            
+        }
+    }
 }
