@@ -21,7 +21,6 @@ import javax.swing.JOptionPane;
 public class AssemblerGUI extends javax.swing.JFrame {
 
     private Assembler assembler;
-    private boolean isAssembled = false;
     private File selectedFile = null;
 
     /**
@@ -127,9 +126,8 @@ public class AssemblerGUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        if (!isAssembled) {
-            assembler = new Assembler();
-        }
+        assembler = new Assembler();
+        
         if(selectedFile==null){
              chooseFile();    
         }
@@ -145,7 +143,6 @@ public class AssemblerGUI extends javax.swing.JFrame {
             return;
         }
         jTextArea2.setText(assembler.writer.toString());
-        isAssembled = true;
         String symTable = "                                Symbol Table \n\n";
         for(String key :assembler.symTable.keySet()){
             symTable+= key;
@@ -158,8 +155,6 @@ public class AssemblerGUI extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         chooseFile();
-        isAssembled = false;
-
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
