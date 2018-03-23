@@ -32,7 +32,7 @@ public class Assembler {
     public StringBuilder writer;
     private OpTable opTable = new OpTable();
 
-    public void executePassOne(String filePath) {
+    public void executePassOne(String filePath) throws RuntimeException{
 
         FileReader fileReader = null;
         String[] tokens;
@@ -73,7 +73,7 @@ public class Assembler {
 
     }
 
-    public void executePassTwo() {
+    public void executePassTwo() throws RuntimeException{
         OpTable opCodes = new OpTable();
         writer = new StringBuilder();
         writer.append("H").append(" ").append(programName).append(" ")
@@ -134,11 +134,8 @@ public class Assembler {
                 writer.append(Integer.toHexString(address));
 
             } else {
-                JOptionPane.showMessageDialog(new JFrame(), 
-                        "Assembling Error: Unknown Operand \"" + instruction.getOperand(), "Dialog",
-                JOptionPane.ERROR_MESSAGE);
-                writer.append("0000"); // to be removed
-                return;
+                throw new RuntimeException("Assembling Error: Unknown Operand \"" + instruction.getOperand());
+                //writer.append("0000"); // to be removed
             }
             writer.append(" ");
             t += 2;

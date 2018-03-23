@@ -5,8 +5,10 @@
  */
 package sicassembler;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.util.Scanner;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -18,7 +20,7 @@ import javax.swing.JOptionPane;
  */
 public class AssemblerGUI extends javax.swing.JFrame {
 
-    private Assembler assembler = new Assembler();
+    private Assembler assembler;
     private boolean isAssembled = false;
     private File selectedFile = null;
 
@@ -125,18 +127,23 @@ public class AssemblerGUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        if (isAssembled) {
+        if (!isAssembled) {
             assembler = new Assembler();
         }
         if(selectedFile==null){
-             JOptionPane.showMessageDialog(new JFrame(),
-                    "Choose the assembly file you want to assemble first", "Error",
+             chooseFile();    
+        }
+        saveChanges();
+        try{
+        assembler.executePassOne(selectedFile.getAbsolutePath());
+        assembler.executePassTwo();
+        }
+        catch(RuntimeException ex){
+            JOptionPane.showMessageDialog(new JFrame(),
+                    ex.getMessage(), "Error",
                     JOptionPane.ERROR_MESSAGE);
             return;
         }
-        saveChanges();
-        assembler.executePassOne(selectedFile.getAbsolutePath());
-        assembler.executePassTwo();
         jTextArea2.setText(assembler.writer.toString());
         isAssembled = true;
         String symTable = "                                Symbol Table \n\n";
@@ -150,26 +157,8 @@ public class AssemblerGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        JFileChooser fileChooser = new JFileChooser();
-        int returnValue = fileChooser.showOpenDialog(null);
-        if (returnValue == JFileChooser.APPROVE_OPTION) {
-            selectedFile = fileChooser.getSelectedFile();
-            isAssembled = false;
-            try {
-                    StringBuilder text = new StringBuilder();
-                    Scanner in = new Scanner(selectedFile);
-                    while (in.hasNext()) {
-                        text.append(in.nextLine());
-                        text.append("\n");
-                    }
-                    jTextArea1.setText(text.toString());
-                    //System.out.println(text.toString());
-                } catch (Exception E) {
-                    jTextArea1.setText(E.toString());
-                }
-
-        }
-
+        chooseFile();
+        isAssembled = false;
 
     }//GEN-LAST:event_jButton2ActionPerformed
 
@@ -208,9 +197,7 @@ public class AssemblerGUI extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new AssemblerGUI().setVisible(true);
-                
-
-                
+  
             }
         });
     }
@@ -228,13 +215,39 @@ public class AssemblerGUI extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     private void saveChanges() {
-        try{
-            byte data[] = jTextArea1.getText().getBytes();
-            FileOutputStream out = new FileOutputStream(selectedFile);
-            out.write(data);
-            out.close();
-        } catch(Exception E) {
+
+           String[] lines = jTextArea1.getText().split("\\n");
+           try {
+                FileWriter filewriter = new FileWriter(selectedFile);
+                BufferedWriter writer = new BufferedWriter(filewriter);
             
+                for(String line : lines){
+                    writer.append(line);
+                    writer.newLine();
+                }
+                writer.close();
+            } catch(Exception E) {
+            
+            }
+    }
+    private void chooseFile(){
+        JFileChooser fileChooser = new JFileChooser();
+        int returnValue = fileChooser.showOpenDialog(null);
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            selectedFile = fileChooser.getSelectedFile();
+            try {
+                    StringBuilder text = new StringBuilder();
+                    Scanner in = new Scanner(selectedFile);
+                    while (in.hasNext()) {
+                        text.append(in.nextLine());
+                        text.append("\n");
+                    }
+                    jTextArea1.setText(text.toString());
+                    //System.out.println(text.toString());
+                } catch (Exception E) {
+                    jTextArea1.setText(E.toString());
+                }
+
         }
     }
 }
