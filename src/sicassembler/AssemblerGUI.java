@@ -147,7 +147,7 @@ public class AssemblerGUI extends javax.swing.JFrame {
         for(String key :assembler.symTable.keySet()){
             symTable+= key;
             for(int i = 20-key.length();i>0;i--) symTable+= " ";
-            symTable+= assembler.symTable.get(key);
+            symTable+= Integer.toHexString(assembler.symTable.get(key)).toUpperCase();
             symTable+="\n";
         }
         jTextArea3.setText(symTable);

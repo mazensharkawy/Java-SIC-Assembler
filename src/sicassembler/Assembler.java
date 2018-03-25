@@ -315,7 +315,7 @@ public class Assembler {
         for (int i = 0; i < length - hexa.length(); i++) {
             out += "0";
         }
-        return out + hexa;
+        return (out + hexa).toUpperCase();
     }
     
     public void writeFile(String filePath) {
