@@ -45,10 +45,10 @@ public class Assembler {
             do {
                 newLine = reader.readLine();
                 parseFirstLine(newLine);
-            } while (newLine.startsWith("#"));
+            } while (newLine.startsWith("#")||newLine.trim().isEmpty());
 
             while ((newLine = reader.readLine()) != null && !startWith(newLine, "END")) {
-                if (newLine.startsWith("#")) {
+                if (newLine.startsWith("#")||newLine.trim().isEmpty()) {
                     continue;
                 }
                 if (isValidAssemblyLine(newLine)) {
