@@ -114,7 +114,12 @@ public class Assembler {
                 instruction.setObjectCode("0000");
                 writer.append("0000");
                 
-            } else if (instruction.getOperand().charAt(0) >= '0' && instruction.getOperand().charAt(0) <= '9') {
+            } else if(instruction.getOperand().charAt(instruction.getOperand().length()-1) == 'H'
+                    && (instruction.getMnemonic().equalsIgnoreCase("byte")|| instruction.getMnemonic().equalsIgnoreCase("word"))){
+                int length = (instruction.getMnemonic().equalsIgnoreCase("byte"))? 2:4;
+                instruction.setObjectCode(instruction.getOperand().substring(0,length+1));
+            }
+            else if (instruction.getOperand().charAt(0) >= '0' && instruction.getOperand().charAt(0) <= '9') {
                 
                 String hexaOperand = Integer.toHexString(Integer.parseInt(instruction.getOperand()));
                 instruction.setObjectCode(formatHexa(hexaOperand, 6));
