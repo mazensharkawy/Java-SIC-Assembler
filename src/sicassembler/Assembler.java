@@ -158,7 +158,7 @@ public class Assembler {
                 //writer.append("0000"); // to be removed
             }
             
-            System.out.println( Integer.toHexString(instruction.getLocation()).toUpperCase() + "\t"  
+            System.out.println( formatHexa(Integer.toHexString(instruction.getLocation()).toUpperCase(), 4) + "\t"  
                     + ((instruction.getSymbol() == null) ? "\t\t" : instruction.getSymbol() + "\t") 
                     + "\t" + instruction.getMnemonic() + "\t" 
                     + instruction.getOperand() + "\t" + opCode+ instruction.getObjectCode());
