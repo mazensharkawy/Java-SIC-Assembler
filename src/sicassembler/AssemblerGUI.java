@@ -143,6 +143,7 @@ public class AssemblerGUI extends javax.swing.JFrame {
             return;
         }
         jTextArea2.setText(assembler.writer.toString());
+        assembler.writeObjectFile(selectedFile);
         String symTable = "                                Symbol Table \n\n";
         for(String key :assembler.symTable.keySet()){
             symTable+= key;

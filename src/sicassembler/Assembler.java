@@ -164,7 +164,7 @@ public class Assembler {
     }
 
     private boolean startWith(String line, String key) {
-        if (line.trim().split("\\s+")[0].equals(key)) {
+        if (line.trim().split("\\s+")[0].toUpperCase().equals(key)) {
             return true;
         }
         return false;
@@ -318,33 +318,12 @@ public class Assembler {
         return (out + hexa).toUpperCase();
     }
     
-    public void writeFile(String filePath) {
-        ArrayList<String> objectCodes = new ArrayList<>();
+    public void writeObjectFile(File file) {
+        String objectFile = file.getName().replace(".txt", "objectCode.txt");
         try {
-            FileWriter filewriter = new FileWriter("objectCode.txt");
+            FileWriter filewriter = new FileWriter(objectFile);
             BufferedWriter writer = new BufferedWriter(filewriter);
-
-            writer.append("H").append(programName).append(" ")
-                    .append(formatHexa(Integer.toHexString(startingAddress), 6)).append(" ")
-                    .append(formatHexa(Integer.toHexString(programLength), 6));
-            writer.newLine();
-            System.out.println("size of T 0: " + getSizeOfT(0));
-            writer.append("T ").append(Integer.toHexString(instructions.get(0).getLocation())).append(" ").append(getSizeOfT(0));
-            int objectsCount = 0;
-            for (int i = 0; i < instructions.size(); i++) {
-                Instruction instruction = instructions.get(i);
-                if (objectsCount++ < 10) {
-                    writer.append(instruction.getMnemonic());
-                    if (instruction.getOperand() != null || symTable.containsKey(instruction.getOperand())) {
-                        writer.append(Integer.toHexString(symTable.get(instruction.getOperand())));
-                    }
-                } else {
-                    writer.newLine();
-                    writer.append("T ");
-                    continue;
-                }
-            }
-
+            writer.write(this.writer.toString());
             writer.close();
         } catch (IOException ex) {
             Logger.getLogger(Assembler.class.getName()).log(Level.SEVERE, null, ex);
