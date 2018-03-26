@@ -119,6 +119,7 @@ public class Assembler {
                     && (instruction.getMnemonic().equalsIgnoreCase("byte")|| instruction.getMnemonic().equalsIgnoreCase("word"))){
                 int length = (instruction.getMnemonic().equalsIgnoreCase("byte"))? 2:4;
                 instruction.setObjectCode(instruction.getOperand().substring(0,length+1));
+                writer.append(instruction.getObjectCode());
             }
             else if (instruction.getOperand().charAt(0) >= '0' && instruction.getOperand().charAt(0) <= '9') {
                 
