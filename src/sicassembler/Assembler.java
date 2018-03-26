@@ -99,9 +99,10 @@ public class Assembler {
 //                }
                 writer.append(formatHexa(getSizeOfT(i),2)).append(" ");
             }
-            
+            String opCode="";
             if (opCodes.getOpCode(instruction.getMnemonic()) != null) {
-                writer.append(opCodes.getOpCode(instruction.getMnemonic()));
+                opCode=opCodes.getOpCode(instruction.getMnemonic());
+                writer.append(opCode);
                 t++;
             } else if (instruction.getMnemonic().equalsIgnoreCase("RESW")
                     || instruction.getMnemonic().equalsIgnoreCase("RESB")) {
@@ -159,7 +160,7 @@ public class Assembler {
             System.out.println( Integer.toHexString(instruction.getLocation()).toUpperCase() + "\t"  
                     + ((instruction.getSymbol() == null) ? "\t\t" : instruction.getSymbol() + "\t") 
                     + "\t" + instruction.getMnemonic() + "\t" 
-                    + instruction.getOperand() + "\t" + instruction.getObjectCode());
+                    + instruction.getOperand() + "\t" + opCode+ instruction.getObjectCode());
             
             writer.append(" ");
             t += 2;
