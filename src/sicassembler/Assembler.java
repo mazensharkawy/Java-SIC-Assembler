@@ -99,7 +99,7 @@ public class Assembler {
 //                }
                 writer.append(formatHexa(getSizeOfT(i),2)).append(" ");
             }
-            System.out.println(((instruction.getSymbol() == null) ? "\t\t" : instruction.getSymbol() + "\t") + instruction.getMnemonic() + "\t" + instruction.getOperand());
+            
             if (opCodes.getOpCode(instruction.getMnemonic()) != null) {
                 writer.append(opCodes.getOpCode(instruction.getMnemonic()));
                 t++;
@@ -110,33 +110,52 @@ public class Assembler {
             }
 
             if (instruction.getOperand() == null) {
+                
+                instruction.setObjectCode("0000");
                 writer.append("0000");
+                
             } else if (instruction.getOperand().charAt(0) >= '0' && instruction.getOperand().charAt(0) <= '9') {
+                
                 String hexaOperand = Integer.toHexString(Integer.parseInt(instruction.getOperand()));
-                writer.append(formatHexa(hexaOperand, 6));
+                instruction.setObjectCode(formatHexa(hexaOperand, 6));
+                writer.append(instruction.getObjectCode());
                 t++;
+                
             } else if (symTable.get(instruction.getOperand()) != null) {
-                writer.append(formatHexa(Integer.toHexString(symTable.get(instruction.getOperand())), 4));
+                
+                instruction.setObjectCode(formatHexa(Integer.toHexString(symTable.get(instruction.getOperand())), 4));
+                writer.append(instruction.getObjectCode());
+                
             } else if (instruction.getOperand().substring(0, 2).equalsIgnoreCase("x'")
                     && instruction.getOperand().charAt(instruction.getOperand().length() - 1) == '\'') {
-                writer.append(instruction.getOperand().substring(2, instruction.getOperand().length() - 1));
+                instruction.setObjectCode(instruction.getOperand().substring(2, instruction.getOperand().length() - 1));
+                writer.append(instruction.getObjectCode());
             } else if (instruction.getOperand().substring(0, 2).equalsIgnoreCase("c'")
                     && instruction.getOperand().charAt(instruction.getOperand().length() - 1) == '\'') {
+                instruction.setObjectCode("");
                 for (char c : instruction.getOperand().substring(2, instruction.getOperand().length() - 1).toCharArray()) {
                     int ascii = (char) c;
-                    writer.append(Integer.toHexString(ascii).toUpperCase());
+                    instruction.setObjectCode(instruction.getObjectCode()+Integer.toHexString(ascii).toUpperCase());
                 }
+                    writer.append(instruction.getObjectCode());
             } else if (instruction.getOperand().contains(",")
                     && (instruction.getOperand().contains("x")) || instruction.getOperand().contains("X")) {
 
                 String[] currentOperands = instruction.getOperand().split("\\,");
                 int address = symTable.get(currentOperands[0]) + 32768;
-                writer.append(Integer.toHexString(address).toUpperCase());
+                instruction.setObjectCode(Integer.toHexString(address).toUpperCase());
+                writer.append(instruction.getObjectCode());
 
             } else {
                 throw new RuntimeException("Assembling Error: Unknown Operand \"" + instruction.getOperand());
                 //writer.append("0000"); // to be removed
             }
+            
+            System.out.println( Integer.toHexString(instruction.getLocation()).toUpperCase() + "\t"  
+                    + ((instruction.getSymbol() == null) ? "\t\t" : instruction.getSymbol() + "\t") 
+                    + "\t" + instruction.getMnemonic() + "\t" 
+                    + instruction.getOperand() + "\t" + instruction.getObjectCode());
+            
             writer.append(" ");
             t += 2;
         }
@@ -158,7 +177,6 @@ public class Assembler {
         if (m1.find() || m2.find() || m3.find()) {
             return true;
         }
-        System.out.println(line);
         System.out.println("Assembly line is incorrect");
         throw new RuntimeException("ERROR, Assembly instruction is incorrect");
     }
@@ -199,7 +217,6 @@ public class Assembler {
             return Integer.toHexString(count).toUpperCase();
 
         } else if (count > 30) {
-            System.out.println(count);
             System.out.println(lastOperation);
             return Integer.toHexString(count - lastOperation).toUpperCase();
         } else {

@@ -15,6 +15,15 @@ public class Instruction {
     private String symbol;
     private String mnemonic;
     private String operand;
+    private String objectCode;
+
+    public String getObjectCode() {
+        return objectCode;
+    }
+
+    public void setObjectCode(String objectCode) {
+        this.objectCode = objectCode;
+    }
     private boolean isIndexed = false;
 
     public boolean isIsIndexed() {
