@@ -124,14 +124,14 @@ public class Assembler {
                     && instruction.getOperand().charAt(instruction.getOperand().length() - 1) == '\'') {
                 for (char c : instruction.getOperand().substring(2, instruction.getOperand().length() - 1).toCharArray()) {
                     int ascii = (char) c;
-                    writer.append(Integer.toHexString(ascii));
+                    writer.append(Integer.toHexString(ascii).toUpperCase());
                 }
             } else if (instruction.getOperand().contains(",")
                     && (instruction.getOperand().contains("x")) || instruction.getOperand().contains("X")) {
 
                 String[] currentOperands = instruction.getOperand().split("\\,");
                 int address = symTable.get(currentOperands[0]) + 32768;
-                writer.append(Integer.toHexString(address));
+                writer.append(Integer.toHexString(address).toUpperCase());
 
             } else {
                 throw new RuntimeException("Assembling Error: Unknown Operand \"" + instruction.getOperand());
