@@ -243,6 +243,9 @@ public class Assembler {
             }
             symTable.put(symbol, locationCounter);
         }
+        else{
+            throw new RuntimeException("Error, Wrong assembly line: " + line);
+        }
         instruction.setSymbol(symbol);
         instruction.setMnemonic(opCode);
         instruction.setOperand(operand);
@@ -324,6 +327,47 @@ public class Assembler {
             FileWriter filewriter = new FileWriter(objectFile);
             BufferedWriter writer = new BufferedWriter(filewriter);
             writer.write(this.writer.toString());
+            writer.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Assembler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+    
+    public void writeIntermediateFile(File file) {
+        String objectFile = file.getName().replace(".txt", "IntermediateFile.txt");
+        try {
+            FileWriter filewriter = new FileWriter(objectFile);
+            BufferedWriter writer = new BufferedWriter(filewriter);
+            
+            writer.append(String.format("%-15s",""));
+            writer.append(String.format("%-15s",programName.toUpperCase()));
+            writer.append(String.format("%-15s","START"));
+            writer.append(String.format("%-15s",formatHexa(Integer.toHexString(startingAddress),4)));
+            writer.newLine();
+            for(Instruction instruction: instructions){
+                writer.append(String.format("%-15s",formatHexa(Integer.toHexString(instruction.getLocation()),4)));
+                
+                if(instruction.getSymbol()!=null){
+                   writer.append(String.format("%-15s",instruction.getSymbol()));
+                
+                }else{
+                    writer.append(String.format("%-15s"," "));
+                }
+                writer.append(String.format("%-15s",instruction.getMnemonic()));
+                
+                if(instruction.getOperand()!=null){
+                   writer.append(String.format("%-15s",instruction.getOperand()));
+                
+                }else{
+                    writer.append(String.format("%-15s"," "));
+                }
+                writer.newLine();   
+            }
+            
+            writer.append(String.format("%-30s",""));
+            writer.append(String.format("%-15s","END"));
+            writer.append(String.format("%-15s",programName.toUpperCase())); 
             writer.close();
         } catch (IOException ex) {
             Logger.getLogger(Assembler.class.getName()).log(Level.SEVERE, null, ex);

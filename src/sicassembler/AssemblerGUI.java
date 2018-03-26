@@ -151,6 +151,7 @@ public class AssemblerGUI extends javax.swing.JFrame {
             symTable+= Integer.toHexString(assembler.symTable.get(key)).toUpperCase();
             symTable+="\n";
         }
+        assembler.writeIntermediateFile(selectedFile);
         jTextArea3.setText(symTable);
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -228,6 +229,8 @@ public class AssemblerGUI extends javax.swing.JFrame {
     }
     private void chooseFile(){
         JFileChooser fileChooser = new JFileChooser();
+        File workingDirectory = new File(System.getProperty("user.dir"));
+        fileChooser.setCurrentDirectory(workingDirectory);
         int returnValue = fileChooser.showOpenDialog(null);
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             selectedFile = fileChooser.getSelectedFile();
