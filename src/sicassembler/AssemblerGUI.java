@@ -152,6 +152,7 @@ public class AssemblerGUI extends javax.swing.JFrame {
             symTable+="\n";
         }
         assembler.writeIntermediateFile(selectedFile);
+        assembler.writeListingFile(selectedFile);
         jTextArea3.setText(symTable);
     }//GEN-LAST:event_jButton1ActionPerformed
 

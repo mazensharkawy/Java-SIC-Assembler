@@ -1,0 +1,31 @@
+               ELEWISE        START          0000           
+0000           BEGIN          LDX            ZERO           
+0003           READL          TD             INDEV          
+0006                          JEQ            READL          
+0009                          RD             INDEV          
+000C                          STCH           ARR1,X         
+000F                          RD             INDEV          
+0012                          STCH           ARR2,X         
+0015                          TIX            THIRTY         
+0018                          JLT            READL          
+001B                          LDA            ZERO           
+001E                          STA            INDEX          
+0021           MULOOP         LDX            INDEX          
+0024                          LDA            ARR1,X         
+0027                          MUL            ARR2,X         
+002A                          STA            RESULT,X       
+002D                          LDA            INDEX          
+0030                          ADD            THREE          
+0033                          STA            INDEX          
+0036                          COMP           TEN            
+0039                          JLT            MULOOP         
+003C           ARR1           RESW           10             
+005A           ARR2           RESW           10             
+0078           RESULT         RESW           10             
+0096           INDEX          RESW           1              
+0099           THREE          WORD           3              
+009C           TEN            WORD           10             
+009F           THIRTY         WORD           30             
+00A2           INDEV          BYTE           X'F1'          
+00A3           ZERO           WORD           0              
+                              END            ELEWISE        

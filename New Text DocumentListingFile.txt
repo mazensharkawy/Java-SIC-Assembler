@@ -1,0 +1,31 @@
+               ELEWISE        START          0000           
+0000           BEGIN          LDX            ZERO           0400A3         
+0003           READL          TD             INDEV          E000A2         
+0006                          JEQ            READL          300003         
+0009                          RD             INDEV          D800A2         
+000C                          STCH           ARR1,X         54803C         
+000F                          RD             INDEV          D800A2         
+0012                          STCH           ARR2,X         54805A         
+0015                          TIX            THIRTY         2C009F         
+0018                          JLT            READL          380003         
+001B                          LDA            ZERO           0000A3         
+001E                          STA            INDEX          0C0096         
+0021           MULOOP         LDX            INDEX          040096         
+0024                          LDA            ARR1,X         00803C         
+0027                          MUL            ARR2,X         20805A         
+002A                          STA            RESULT,X       0C8078         
+002D                          LDA            INDEX          000096         
+0030                          ADD            THREE          180099         
+0033                          STA            INDEX          0C0096         
+0036                          COMP           TEN            28009C         
+0039                          JLT            MULOOP         380021         
+003C           ARR1           RESW           10                            
+005A           ARR2           RESW           10                            
+0078           RESULT         RESW           10                            
+0096           INDEX          RESW           1                             
+0099           THREE          WORD           3              000003         
+009C           TEN            WORD           10             00000A         
+009F           THIRTY         WORD           30             00001E         
+00A2           INDEV          BYTE           X'F1'          F1             
+00A3           ZERO           WORD           0              000000         
+                              END            ELEWISE        
